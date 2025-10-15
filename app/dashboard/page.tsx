@@ -1,8 +1,33 @@
-export default function DashboardPage() {
-    return (
-        <div>
-            <h1 className="text-3xl font-bold">Welcome to your Dashboard</h1>
-            <p className="mt-2 text-gray-600">This is your main dashboard view.</p>
-        </div>
-    )
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getEnrollmentsPerCourse, getStudentGrowthOverTime } from "./actions";
+import { EnrollmentsBarChart } from "../components/charts/EnrollmentsBarChart";
+import { StudentGrowthLineChart } from "../components/charts/StudentGrowthLineChart";
+
+export default async function DashboardPage() {
+  const enrollmentsData = await getEnrollmentsPerCourse();
+  const studentGrowthData = await getStudentGrowthOverTime();
+
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Dashboard Analytics</h1>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Enrollments per Course</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EnrollmentsBarChart data={enrollmentsData} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>New Students per Day</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <StudentGrowthLineChart data={studentGrowthData} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }

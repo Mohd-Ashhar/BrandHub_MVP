@@ -3,15 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link"; // Import the Link component
 
 // This type is used to define the shape of our data.
 export type Student = {
@@ -47,6 +40,18 @@ export const columns: ColumnDef<Student>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    // Make the name a link to the detail page
+    cell: ({ row }) => {
+      const student = row.original;
+      return (
+        <Link
+          href={`/dashboard/students/${student.id}`}
+          className="hover:underline font-medium"
+        >
+          {student.name}
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "email",
@@ -73,31 +78,6 @@ export const columns: ColumnDef<Student>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const student = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(student.id)}
-            >
-              Copy student ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {/* We will add Edit and Delete functionality here in the next steps */}
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    // Cell is rendered by data-table.tsx
   },
 ];
