@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -16,6 +17,17 @@ interface ChartData {
 }
 
 export function StudentGrowthLineChart({ data }: { data: ChartData[] }) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Render a placeholder or null on the server
+  if (!isClient) {
+    return <div style={{ width: "100%", height: "350px" }} />;
+  }
+
   return (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart data={data}>
