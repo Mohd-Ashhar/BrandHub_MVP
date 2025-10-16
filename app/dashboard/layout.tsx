@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "@/app/components/Sidebar"; // Adjusted path from original code
+import Header from "@/app/components/Header"; // Adjusted path from original code
+import { AI } from "@/app/action"; // Import the AI provider
 
 export default async function DashboardLayout({
   children,
@@ -19,12 +20,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <Header email={user.email!} />
-        <main className="flex-1 p-6">{children}</main>
+    <AI>
+      {" "}
+      {/* This provider is essential */}
+      <div className="flex h-screen bg-gray-100">
+        <Sidebar />
+        <div className="flex flex-1 flex-col">
+          <Header email={user.email!} />
+          <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        </div>
       </div>
-    </div>
+    // </AI>
   );
 }
