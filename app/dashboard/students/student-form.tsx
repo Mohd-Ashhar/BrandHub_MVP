@@ -30,9 +30,10 @@ const formSchema = z.object({
 interface StudentFormProps {
   student?: Student; // Student data for editing, optional
   onClose: () => void; // Function to close the dialog
+  brandId: string;
 }
 
-export function StudentForm({ student, onClose }: StudentFormProps) {
+export function StudentForm({ student, onClose, brandId }: StudentFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,8 +51,8 @@ export function StudentForm({ student, onClose }: StudentFormProps) {
     formData.append("email", values.email);
 
     const result = student
-      ? await updateStudent(student.id, formData)
-      : await createStudent(formData);
+      ? await updateStudent(student.id, formData, brandId)
+      : await createStudent(formData, brandId);
 
     if (result.success) {
       onClose(); // Close the dialog on success

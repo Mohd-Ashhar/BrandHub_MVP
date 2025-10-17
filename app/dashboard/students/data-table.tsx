@@ -51,11 +51,13 @@ import { deleteStudent } from "./actions";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  brandId: string; // Add brandId to props
 }
 
 export function DataTable<TData, TValue>({
   columns: initialColumns,
   data,
+  brandId, // Destructure brandId
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -89,7 +91,7 @@ export function DataTable<TData, TValue>({
 
   const handleDelete = async () => {
     if (deletingStudent) {
-      await deleteStudent(deletingStudent.id);
+      await deleteStudent(deletingStudent.id, brandId); // Pass brandId
       closeAlert();
     }
   };
@@ -224,7 +226,11 @@ export function DataTable<TData, TValue>({
               {editingStudent ? "Edit Student" : "Add New Student"}
             </DialogTitle>
           </DialogHeader>
-          <StudentForm student={editingStudent} onClose={closeDialog} />
+          <StudentForm
+            student={editingStudent}
+            onClose={closeDialog}
+            brandId={brandId}
+          />
         </DialogContent>
       </Dialog>
 

@@ -3,12 +3,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function createCourse(formData: FormData) {
+export async function createCourse(formData: FormData, brandId: string) {
   const supabase = createClient();
   try {
     const data = {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
+      brand_id: brandId,
     };
 
     const { error } = await supabase.from("courses").insert(data);
@@ -25,7 +26,11 @@ export async function createCourse(formData: FormData) {
   }
 }
 
-export async function updateCourse(id: string, formData: FormData) {
+export async function updateCourse(
+  id: string,
+  formData: FormData,
+  brandId: string
+) {
   const supabase = createClient();
   try {
     const data = {
@@ -33,7 +38,11 @@ export async function updateCourse(id: string, formData: FormData) {
       description: formData.get("description") as string,
     };
 
-    const { error } = await supabase.from("courses").update(data).eq("id", id);
+    const { error } = await supabase
+      .from("courses")
+      .update(data)
+      .eq("id", id)
+      .eq("brand_id", brandId);
 
     if (error) {
       throw new Error(`Could not update course: ${error.message}`);
@@ -47,10 +56,14 @@ export async function updateCourse(id: string, formData: FormData) {
   }
 }
 
-export async function deleteCourse(id: string) {
+export async function deleteCourse(id: string, brandId: string) {
   const supabase = createClient();
   try {
-    const { error } = await supabase.from("courses").delete().eq("id", id);
+    const { error } = await supabase
+      .from("courses")
+      .delete()
+      .eq("id", id)
+      .eq("brand_id", brandId);
 
     if (error) {
       throw new Error(`Could not delete course: ${error.message}`);

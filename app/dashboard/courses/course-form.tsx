@@ -25,9 +25,10 @@ const formSchema = z.object({
 interface CourseFormProps {
   course?: Course;
   onClose: () => void;
+  brandId: string; // Add brandId to props
 }
 
-export function CourseForm({ course, onClose }: CourseFormProps) {
+export function CourseForm({ course, onClose, brandId }: CourseFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,8 +46,8 @@ export function CourseForm({ course, onClose }: CourseFormProps) {
     formData.append("description", values.description || "");
 
     const result = course
-      ? await updateCourse(course.id, formData)
-      : await createCourse(formData);
+      ? await updateCourse(course.id, formData, brandId)
+      : await createCourse(formData, brandId);
 
     if (result.success) {
       onClose();
