@@ -11,7 +11,6 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -20,37 +19,25 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("brand_id, brands(name)")
     .eq("id", user.id)
     .single();
 
-  const brandId = profile?.brand_id;
+  if (error) {
+    console.error("Profile fetch error:", error);
+  }
 
-  // FIX: Supabase returns the joined 'brands' as an array of objects.
-  // We access the 'name' from the first object in the array.
-  const brandName = profile?.brands?.[0]?.name || "No Brand Assigned";
-
-  // Pass brandId down to page components
-  const childrenWithProps = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { brandId } as {
-        brandId: string | null;
-      });
-    }
-    return child;
-  });
+  const brandName = profile?.brands?.name || "No Brand Assigned";
 
   return (
     <AI>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen">
         <Sidebar />
-        <div className="flex flex-1 flex-col">
-          <Header email={user.email!} brandName={brandName} />
-          <main className="flex-1 p-6 overflow-y-auto">
-            {childrenWithProps}
-          </main>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <Header userName={user.email || ""} brandName={brandName} />
+          <main className="flex-1 overflow-auto p-6">{children}</main>
         </div>
       </div>
     </AI>

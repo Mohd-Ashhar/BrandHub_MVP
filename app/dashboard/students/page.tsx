@@ -1,21 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { getBrandId } from "@/lib/get-brand-id";
 
-export default async function StudentsPage({
-  brandId,
-}: {
-  brandId: string | null;
-}) {
-  // FIX: Add a guard clause to prevent DB query if brandId is missing
+export default async function StudentsPage() {
+  const brandId = await getBrandId();
+
   if (!brandId) {
-    // This will be rendered inside the layout, so the user sees a helpful message.
     return (
-      <div className="container mx-auto py-10 text-center">
-        <h1 className="text-xl font-bold text-destructive">
-          Unable to load students.
-        </h1>
-        <p className="text-muted-foreground">
+      <div className="text-center py-10">
+        <p className="text-red-500 text-xl">Unable to load students.</p>
+        <p className="text-gray-600">
           No brand is associated with your user account.
         </p>
       </div>
@@ -23,6 +18,7 @@ export default async function StudentsPage({
   }
 
   const supabase = createClient();
+
   const { data: students, error } = await supabase
     .from("students")
     .select("*")
@@ -30,15 +26,17 @@ export default async function StudentsPage({
 
   if (error) {
     console.error("Error fetching students:", error);
-    return <div>Error loading data.</div>;
+    return (
+      <div className="text-center py-10">
+        <p className="text-red-500 text-xl">Unable to load students.</p>
+        <p className="text-gray-600">{error.message}</p>
+      </div>
+    );
   }
-
-  const studentData = students || [];
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Students</h1>
-      <DataTable columns={columns} data={studentData} brandId={brandId} />
+      <DataTable columns={columns} data={students || []} brandId={brandId} />
     </div>
   );
 }
