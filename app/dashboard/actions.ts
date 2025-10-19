@@ -16,7 +16,7 @@ export async function getEnrollmentsPerCourse() {
   }
 
   return data;
-}a
+}
 
 export async function getStudentGrowthOverTime() {
   const supabase = createClient();

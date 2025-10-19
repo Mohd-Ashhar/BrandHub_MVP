@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, BookOpen, BarChart3, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, BarChart3, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signout } from "@/app/auth/actions";
 
@@ -14,7 +14,6 @@ export function AdminNav() {
     { href: "/dashboard/admin/students", label: "Students", icon: Users },
     { href: "/dashboard/admin/courses", label: "Courses", icon: BookOpen },
     { href: "/dashboard/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
