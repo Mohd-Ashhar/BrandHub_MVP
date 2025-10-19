@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-// ============================================================
-// LOGIN ACTION (Enhanced with Role-Based Redirect)
-// ============================================================
+// ============================================
+// LOGIN ACTION
+// ============================================
 export async function login(formData: FormData) {
   const supabase = createClient();
 
@@ -24,22 +24,60 @@ export async function login(formData: FormData) {
     redirect("/login?message=Invalid email or password");
   }
 
-  // Fetch user role from profiles table
+  // ✅ FIX: Check if profile exists, create if missing
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role, brand_id")
     .eq("id", authData.user.id)
     .single();
 
-  if (profileError) {
-    console.error("Profile fetch error:", profileError);
-    redirect("/login?message=Could not fetch user profile");
+  if (profileError || !profile) {
+    console.error("Profile not found, creating...", profileError);
+
+    // Create profile from auth user metadata
+    const { error: createError } = await supabase.from("profiles").insert({
+      id: authData.user.id,
+      email: authData.user.email,
+      name: authData.user.user_metadata?.full_name || authData.user.email,
+      role: authData.user.user_metadata?.role || "student",
+    });
+
+    if (createError) {
+      console.error("Failed to create profile:", createError);
+      redirect(
+        "/login?message=Could not fetch user profile. Please contact support."
+      );
+    }
+
+    // Retry fetching profile
+    const { data: newProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", authData.user.id)
+      .single();
+
+    if (!newProfile) {
+      redirect("/login?message=Could not fetch user profile");
+    }
+
+    // Use new profile for redirect
+    revalidatePath("/", "layout");
+    switch (newProfile.role) {
+      case "admin":
+        redirect("/dashboard/admin");
+      case "instructor":
+        redirect("/dashboard/instructor");
+      case "student":
+        redirect("/dashboard/student");
+      default:
+        redirect("/dashboard");
+    }
   }
 
   revalidatePath("/", "layout");
 
   // Role-based redirect
-  switch (profile?.role) {
+  switch (profile.role) {
     case "admin":
       redirect("/dashboard/admin");
     case "instructor":
@@ -51,20 +89,20 @@ export async function login(formData: FormData) {
   }
 }
 
-// ============================================================
-// SIGNUP ACTION (Enhanced with Role and Name)
-// ============================================================
+// ============================================
+// SIGNUP ACTION
+// ============================================
 export async function signup(formData: FormData) {
   const supabase = createClient();
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("name") as string;
-  const role = (formData.get("role") as string) || "student"; // Default to student
+  const role = (formData.get("role") as string) || "student";
 
   // Validate role
   if (!["student", "instructor", "admin"].includes(role)) {
-    redirect("/login?message=Invalid role selected");
+    redirect("/signup?message=Invalid role selected");
   }
 
   // Sign up with Supabase Auth
@@ -81,24 +119,25 @@ export async function signup(formData: FormData) {
 
   if (authError) {
     console.error("Signup error:", authError);
-    redirect("/login?message=Could not create account");
+    redirect(`/signup?message=${encodeURIComponent(authError.message)}`);
   }
 
   if (!authData.user) {
-    redirect("/login?message=Could not create account");
+    redirect("/signup?message=Could not create account");
   }
 
-  // Create profile in profiles table
+  // ✅ IMPORTANT: Create profile manually (don't rely on trigger)
   const { error: profileError } = await supabase.from("profiles").insert({
     id: authData.user.id,
     email: email,
     name: fullName,
     role: role,
+    created_at: new Date().toISOString(),
   });
 
   if (profileError) {
     console.error("Profile creation error:", profileError);
-    // Continue anyway - profile might already exist
+    // Continue anyway - trigger might have created it
   }
 
   // If student role, create student record
@@ -115,7 +154,7 @@ export async function signup(formData: FormData) {
     }
   }
 
-  // If instructor role, create instructor record (if you have instructors table)
+  // If instructor role, create instructor record
   if (role === "instructor") {
     const { error: instructorError } = await supabase
       .from("instructors")
@@ -131,76 +170,15 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-
-  // Check if email confirmation is required
-  // If you disabled email confirmation in Supabase, redirect to dashboard
-  // Otherwise, show confirmation message
-  redirect(
-    "/login?message=Account created! Please check your email to verify."
-  );
+  redirect("/login?message=Account created successfully! Please sign in.");
 }
 
-// ============================================================
+// ============================================
 // SIGNOUT ACTION
-// ============================================================
+// ============================================
 export async function signout() {
   const supabase = createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");
-}
-
-// ============================================================
-// GET CURRENT USER WITH ROLE (Helper Function)
-// ============================================================
-export async function getCurrentUser() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return null;
-  }
-
-  // Fetch profile with role
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("id, email, name, role, brand_id, created_at")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError || !profile) {
-    return null;
-  }
-
-  return {
-    ...user,
-    role: profile.role,
-    name: profile.name,
-    brand_id: profile.brand_id,
-  };
-}
-
-// ============================================================
-// GET USER ROLE (Helper Function)
-// ============================================================
-export async function getUserRole() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, brand_id")
-    .eq("id", user.id)
-    .single();
-
-  return profile?.role || null;
 }

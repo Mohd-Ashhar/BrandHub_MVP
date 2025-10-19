@@ -18,11 +18,15 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 
-export default function SignupPage({
+// ✅ FIX: Make async and await searchParams
+export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: { message?: string };
+  searchParams: Promise<{ message?: string }>; // ← Changed to Promise
 }) {
+  // ✅ Await searchParams
+  const params = await searchParams;
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
@@ -75,7 +79,7 @@ export default function SignupPage({
 
             <div className="space-y-2">
               <Label htmlFor="role">I am a...</Label>
-              <Select name="role" defaultValue="student" required>
+              <Select name="role" defaultValue="student">
                 <SelectTrigger>
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
@@ -87,15 +91,17 @@ export default function SignupPage({
               </Select>
             </div>
 
-            {searchParams?.message && (
+            {/* ✅ FIX: Use params instead of searchParams */}
+            {params?.message && (
               <div
                 className={`rounded-md p-3 text-sm ${
-                  searchParams.message.includes("created")
-                    ? "bg-green-50 text-green-600"
-                    : "bg-red-50 text-red-600"
+                  params.message.includes("created") ||
+                  params.message.includes("success")
+                    ? "bg-green-50 text-green-600 border border-green-200"
+                    : "bg-red-50 text-red-600 border border-red-200"
                 }`}
               >
-                {searchParams.message}
+                {params.message}
               </div>
             )}
 
