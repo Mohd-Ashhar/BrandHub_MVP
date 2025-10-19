@@ -261,7 +261,7 @@ export default function LandingPage() {
           <p>
             Built with ❤️ for House of EdTech by{" "}
             <a
-              href="https://github.com/Mohd-Ashhar"
+              href="https://linkedin.com/in/mohd-ashhar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
