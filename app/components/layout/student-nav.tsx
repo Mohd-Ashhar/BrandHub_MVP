@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BookOpen,
@@ -9,83 +10,81 @@ import {
   Award,
   TrendingUp,
   LogOut,
-  Sparkles,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signout } from "@/app/auth/actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 
+const navItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard/student",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "My Courses",
+    href: "/dashboard/student/courses",
+    icon: BookOpen,
+  },
+  {
+    title: "Schedule",
+    href: "/dashboard/student/schedule",
+    icon: Calendar,
+  },
+  {
+    title: "Certificates",
+    href: "/dashboard/student/certificates",
+    icon: Award,
+  },
+  {
+    title: "My Progress",
+    href: "/dashboard/student/progress",
+    icon: TrendingUp,
+  },
+];
+
 interface StudentNavProps {
   userName: string;
+  userEmail: string;
   engagementScore: number;
 }
 
-export function StudentNav({ userName, engagementScore }: StudentNavProps) {
+export function StudentNav({
+  userName,
+  userEmail,
+  engagementScore,
+}: StudentNavProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    {
-      href: "/dashboard/student",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      href: "/dashboard/student/courses",
-      label: "My Courses",
-      icon: BookOpen,
-    },
-    {
-      href: "/dashboard/student/schedule",
-      label: "Schedule",
-      icon: Calendar,
-    },
-    {
-      href: "/dashboard/student/certificates",
-      label: "Certificates",
-      icon: Award,
-    },
-    {
-      href: "/dashboard/student/progress",
-      label: "My Progress",
-      icon: TrendingUp,
-    },
-  ];
-
-  // Get initials for avatar
-  const initials = userName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
-  // Determine engagement color
-  const getEngagementColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
-    return "text-red-600";
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-purple-900 to-purple-800 text-white flex flex-col shadow-xl">
+    <div className="flex h-screen w-64 flex-col bg-gradient-to-b from-purple-900 to-purple-800 text-white">
       {/* Header */}
       <div className="p-6 border-b border-purple-700">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-8 w-8 text-yellow-300" />
+        <div className="flex items-center gap-3">
+          <GraduationCap className="h-8 w-8" />
           <div>
-            <h1 className="text-xl font-bold">BrandHub</h1>
-            <p className="text-xs text-purple-200">Student Portal</p>
+            <h2 className="text-xl font-bold">BrandHub</h2>
+            <p className="text-sm text-purple-200">Student Portal</p>
           </div>
         </div>
       </div>
 
-      {/* User Info */}
+      {/* User Profile */}
       <div className="p-4 border-b border-purple-700">
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="h-10 w-10 bg-purple-600">
-            <AvatarFallback className="bg-purple-600 text-white font-semibold">
-              {initials}
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-purple-700 text-white">
+              {getInitials(userName)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
@@ -93,45 +92,34 @@ export function StudentNav({ userName, engagementScore }: StudentNavProps) {
             <p className="text-xs text-purple-200">Student</p>
           </div>
         </div>
-
-        {/* Engagement Score */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-purple-200">Engagement Score</span>
-            <span
-              className={`font-bold ${getEngagementColor(engagementScore)}`}
-            >
-              {engagementScore}%
-            </span>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs">
+            <span className="text-purple-200">LMS Progress Together!</span>
+            <span className="font-medium">{engagementScore}%</span>
           </div>
           <Progress value={engagementScore} className="h-2 bg-purple-700" />
-          <p className="text-xs text-purple-300">
-            {engagementScore >= 80
-              ? "🔥 Excellent! Keep it up!"
-              : engagementScore >= 60
-              ? "💪 Good progress!"
-              : "📚 Let's improve together!"}
-          </p>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive
-                  ? "bg-white text-purple-900 shadow-md font-medium"
-                  : "text-purple-100 hover:bg-purple-700 hover:text-white"
-              }`}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              <span className="text-sm">{item.label}</span>
+            <Link key={item.href} href={item.href}>
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                  isActive
+                    ? "bg-white text-purple-900 font-medium"
+                    : "text-purple-100 hover:bg-purple-700"
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <span>{item.title}</span>
+              </div>
             </Link>
           );
         })}
@@ -139,17 +127,17 @@ export function StudentNav({ userName, engagementScore }: StudentNavProps) {
 
       {/* Sign Out */}
       <div className="p-4 border-t border-purple-700">
-        <form action={signout}>
+        <form action="/auth/signout" method="post">
           <Button
             type="submit"
             variant="ghost"
-            className="w-full justify-start text-purple-100 hover:text-white hover:bg-purple-700 transition-colors"
+            className="w-full justify-start text-purple-100 hover:bg-purple-700 hover:text-white"
           >
-            <LogOut className="h-5 w-5 mr-3" />
-            <span className="text-sm">Sign Out</span>
+            <LogOut className="mr-3 h-5 w-5" />
+            Sign Out
           </Button>
         </form>
       </div>
-    </aside>
+    </div>
   );
 }
