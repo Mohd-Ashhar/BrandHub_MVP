@@ -4,10 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 // ============================================
-// CREATE STUDENT (Complete Workflow)
+// CREATE STUDENT (Fixed - No Duplicate Profile)
 // ============================================
 export async function createStudent(formData: FormData) {
-  const supabase = createClient(true);
+  const supabase = createClient();
 
   try {
     // 1. Extract form data
@@ -27,17 +27,32 @@ export async function createStudent(formData: FormData) {
       };
     }
 
-    // 3. Create auth user (using service role)
-    const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true, // Auto-confirm email
-        user_metadata: {
+    // 3. Check if user already exists
+    const { data: existingUser } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("email", email)
+      .single();
+
+    if (existingUser) {
+      return {
+        success: false,
+        message: "A user with this email already exists",
+      };
+    }
+
+    // 4. Create auth user with metadata (trigger will create profile)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: undefined, // Disable email confirmation for admin-created users
+        data: {
           full_name: name,
           role: "student",
         },
-      });
+      },
+    });
 
     if (authError) {
       console.error("Auth creation error:", authError);
@@ -54,26 +69,47 @@ export async function createStudent(formData: FormData) {
       };
     }
 
-    // 4. Create profile
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: authData.user.id,
-      email,
-      name,
-      role: "student",
-      brand_id: brandId || null,
-    });
+    // ✅ FIX: Wait a bit for trigger to complete
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    if (profileError) {
-      console.error("Profile creation error:", profileError);
-      // Try to clean up auth user if profile fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
-      return {
-        success: false,
-        message: `Failed to create profile: ${profileError.message}`,
-      };
+    // 5. Check if profile was created by trigger
+    const { data: profile, error: profileCheckError } = await supabase
+      .from("profiles")
+      .select("id, role")
+      .eq("id", authData.user.id)
+      .single();
+
+    // 6. If profile doesn't exist, create it manually (fallback)
+    if (profileCheckError || !profile) {
+      console.log("Profile not created by trigger, creating manually...");
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: authData.user.id,
+        email,
+        name,
+        role: "student",
+        brand_id: brandId || null,
+      });
+
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // Try to clean up auth user
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        return {
+          success: false,
+          message: `Failed to create profile: ${profileError.message}`,
+        };
+      }
+    } else {
+      // Profile exists from trigger, just update brand_id if needed
+      if (brandId) {
+        await supabase
+          .from("profiles")
+          .update({ brand_id: brandId })
+          .eq("id", authData.user.id);
+      }
     }
 
-    // 5. Create student record
+    // 7. Create student record
     const { error: studentError } = await supabase.from("students").insert({
       id: authData.user.id,
       email,
@@ -87,7 +123,7 @@ export async function createStudent(formData: FormData) {
 
     if (studentError) {
       console.error("Student creation error:", studentError);
-      // Clean up
+      // Clean up on failure
       await supabase.from("profiles").delete().eq("id", authData.user.id);
       await supabase.auth.admin.deleteUser(authData.user.id);
       return {
@@ -119,6 +155,7 @@ export async function updateStudent(id: string, formData: FormData) {
     const phoneNumber = formData.get("phoneNumber") as string;
     const city = formData.get("city") as string;
     const state = formData.get("state") as string;
+    const brandId = formData.get("brandId") as string;
 
     // Update student record
     const { error: studentError } = await supabase
@@ -129,6 +166,7 @@ export async function updateStudent(id: string, formData: FormData) {
         phone_number: phoneNumber || null,
         city: city || null,
         state: state || null,
+        brand_id: brandId || null,
       })
       .eq("id", id);
 
@@ -151,20 +189,14 @@ export async function updateStudent(id: string, formData: FormData) {
 }
 
 // ============================================
-// DELETE STUDENT (Soft Delete)
+// DELETE STUDENT
 // ============================================
 export async function deleteStudent(id: string) {
   const supabase = createClient();
 
   try {
-    // Option 1: Soft delete (recommended)
-    const { error } = await supabase
-      .from("students")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", id);
-
-    // Option 2: Hard delete (if you prefer)
-    // const { error } = await supabase.auth.admin.deleteUser(id);
+    // Delete from auth (cascade will handle profiles and students)
+    const { error } = await supabase.auth.admin.deleteUser(id);
 
     if (error) {
       return {
@@ -181,7 +213,7 @@ export async function deleteStudent(id: string) {
 }
 
 // ============================================
-// ENROLL STUDENT
+// ENROLL STUDENT IN COURSE
 // ============================================
 export async function enrollStudent(formData: FormData) {
   const supabase = createClient();

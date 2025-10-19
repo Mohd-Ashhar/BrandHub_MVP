@@ -13,19 +13,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, AlertCircle } from "lucide-react";
-import { createStudent } from "@/app/dashboard/admin/students/actions";
+import { updateStudent } from "@/app/dashboard/admin/students/actions";
 
 interface Brand {
   id: string;
   name: string;
 }
 
-export function StudentForm({ brands }: { brands: Brand[] }) {
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  phone_number?: string;
+  city?: string;
+  state?: string;
+  brand_id?: string;
+}
+
+export function EditStudentForm({
+  student,
+  brands,
+}: {
+  student: Student;
+  brands: Brand[];
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>(
-    undefined
+    student.brand_id || undefined
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,82 +50,55 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-
-    // Only append brand if selected
     if (selectedBrand) {
       formData.append("brandId", selectedBrand);
     }
 
-    const result = await createStudent(formData);
+    const result = await updateStudent(student.id, formData);
 
     if (result.success) {
-      router.push("/dashboard/admin/students");
+      router.push(`/dashboard/admin/students/${student.id}`);
       router.refresh();
     } else {
-      setError(result.message || "Failed to create student");
+      setError(result.message || "Failed to update student");
       setLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Name and Email */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">
-            Full Name <span className="text-red-500">*</span>
-          </Label>
+          <Label htmlFor="name">Full Name *</Label>
           <Input
             id="name"
             name="name"
-            placeholder="John Doe"
+            defaultValue={student.name}
             required
             disabled={loading}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">
-            Email <span className="text-red-500">*</span>
-          </Label>
+          <Label htmlFor="email">Email *</Label>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="john@example.com"
+            defaultValue={student.email}
             required
             disabled={loading}
           />
         </div>
       </div>
 
-      {/* Password */}
-      <div className="space-y-2">
-        <Label htmlFor="password">
-          Temporary Password <span className="text-red-500">*</span>
-        </Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Minimum 6 characters"
-          minLength={6}
-          required
-          disabled={loading}
-        />
-        <p className="text-xs text-gray-500">
-          This will be the student's initial password.
-        </p>
-      </div>
-
-      {/* Phone and City */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="phoneNumber">Phone Number</Label>
           <Input
             id="phoneNumber"
             name="phoneNumber"
-            placeholder="+91 98765 43210"
+            defaultValue={student.phone_number || ""}
             disabled={loading}
           />
         </div>
@@ -119,40 +108,37 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
           <Input
             id="city"
             name="city"
-            placeholder="Mumbai"
+            defaultValue={student.city || ""}
             disabled={loading}
           />
         </div>
       </div>
 
-      {/* State and Brand */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="state">State</Label>
           <Input
             id="state"
             name="state"
-            placeholder="Maharashtra"
+            defaultValue={student.state || ""}
             disabled={loading}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="brandId">Brand (Optional)</Label>
+          <Label htmlFor="brandId">Brand</Label>
           <Select
             value={selectedBrand}
-            onValueChange={(value) => {
-              // ✅ FIX: Handle "unassigned" properly
-              setSelectedBrand(value === "unassigned" ? undefined : value);
-            }}
+            onValueChange={(value) =>
+              setSelectedBrand(value === "unassigned" ? undefined : value)
+            }
             disabled={loading}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select brand (optional)" />
+              <SelectValue placeholder="Select brand" />
             </SelectTrigger>
             <SelectContent>
-              {/* ✅ FIX: Use valid non-empty value */}
-              <SelectItem value="unassigned">No brand assigned</SelectItem>
+              <SelectItem value="unassigned">No brand</SelectItem>
               {brands.map((brand) => (
                 <SelectItem key={brand.id} value={brand.id}>
                   {brand.name}
@@ -163,22 +149,17 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-600">
           <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-medium">Error creating student</p>
-            <p>{error}</p>
-          </div>
+          <p>{error}</p>
         </div>
       )}
 
-      {/* Buttons */}
       <div className="flex gap-3 pt-4">
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {loading ? "Creating..." : "Create Student"}
+          {loading ? "Saving..." : "Save Changes"}
         </Button>
         <Button
           type="button"

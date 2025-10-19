@@ -1,118 +1,197 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Student } from "./columns";
-import { createStudent, updateStudent } from "./actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2, AlertCircle } from "lucide-react";
+import { createStudent } from "@/app/dashboard/admin/students/actions";
 
-// Define the form schema for validation
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-});
-
-interface StudentFormProps {
-  student?: Student; // Student data for editing, optional
-  onClose: () => void; // Function to close the dialog
-  brandId: string;
+interface Brand {
+  id: string;
+  name: string;
 }
 
-export function StudentForm({ student, onClose, brandId }: StudentFormProps) {
-  const [serverError, setServerError] = useState<string | null>(null);
+export function StudentForm({ brands }: { brands: Brand[] }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<string | undefined>(
+    undefined
+  ); // ✅ Changed to undefined
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: student?.name || "",
-      email: student?.email || "",
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setServerError(null); // Clear previous errors
-    const formData = new FormData();
-    formData.append("name", values.name);
-    formData.append("email", values.email);
+    const formData = new FormData(e.currentTarget);
 
-    const result = student
-      ? await updateStudent(student.id, formData, brandId)
-      : await createStudent(formData, brandId);
+    // ✅ Only append brand if selected
+    if (selectedBrand) {
+      formData.append("brandId", selectedBrand);
+    }
+
+    const result = await createStudent(formData);
 
     if (result.success) {
-      onClose(); // Close the dialog on success
-    } else if (result.message) {
-      // Create a more user-friendly error message
-      if (result.message.includes("students_email_key")) {
-        setServerError("A student with this email already exists.");
-      } else {
-        setServerError(result.message);
-      }
+      router.push("/dashboard/admin/students");
+      router.refresh();
+    } else {
+      setError(result.message || "Failed to create student");
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Name and Email */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">
+            Full Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="name"
             name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            placeholder="John Doe"
+            required
+            disabled={loading}
           />
-          <FormField
-            control={form.control}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">
+            Email <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="email"
             name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="john.doe@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            type="email"
+            placeholder="john@example.com"
+            required
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      {/* Password */}
+      <div className="space-y-2">
+        <Label htmlFor="password">
+          Temporary Password <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Minimum 6 characters"
+          minLength={6}
+          required
+          disabled={loading}
+        />
+        <p className="text-xs text-gray-500">
+          This will be the student's initial password. They should change it
+          after first login.
+        </p>
+      </div>
+
+      {/* Phone and City */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="phoneNumber">Phone Number</Label>
+          <Input
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="+91 98765 43210"
+            disabled={loading}
           />
         </div>
 
-        {serverError && (
-          <div className="rounded-md border border-red-500 bg-red-50 p-3 text-sm text-red-700">
-            <p>{serverError}</p>
-          </div>
-        )}
-
-        <div className="flex justify-end space-x-4 pt-2">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Saving..." : "Save"}
-          </Button>
+        <div className="space-y-2">
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            name="city"
+            placeholder="Mumbai"
+            disabled={loading}
+          />
         </div>
-      </form>
-    </Form>
+      </div>
+
+      {/* State and Brand */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="state">State</Label>
+          <Input
+            id="state"
+            name="state"
+            placeholder="Maharashtra"
+            disabled={loading}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="brandId">Brand (Optional)</Label>
+          <Select
+            value={selectedBrand}
+            onValueChange={(value) =>
+              setSelectedBrand(value === "none" ? undefined : value)
+            } // ✅ Handle "none"
+            disabled={loading}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select brand (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              {/* ✅ FIX: Use valid value instead of empty string */}
+              <SelectItem value="none">No brand assigned</SelectItem>
+              {brands.map((brand) => (
+                <SelectItem key={brand.id} value={brand.id}>
+                  {brand.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500">
+            Leave unassigned if student isn't associated with a specific brand
+          </p>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-600">
+          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium">Error creating student</p>
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex gap-3 pt-4">
+        <Button type="submit" disabled={loading}>
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {loading ? "Creating..." : "Create Student"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
+      </div>
+    </form>
   );
 }
