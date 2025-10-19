@@ -2,81 +2,83 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BookOpen,
   Users,
   ClipboardCheck,
-  BarChart3,
+  TrendingUp,
   LogOut,
   GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signout } from "@/app/auth/actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+const navItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard/instructor",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "My Courses",
+    href: "/dashboard/instructor/courses",
+    icon: BookOpen,
+  },
+  {
+    title: "My Students",
+    href: "/dashboard/instructor/students",
+    icon: Users,
+  },
+  {
+    title: "Attendance",
+    href: "/dashboard/instructor/attendance",
+    icon: ClipboardCheck,
+  },
+  {
+    title: "Performance",
+    href: "/dashboard/instructor/performance",
+    icon: TrendingUp,
+  },
+];
 
 interface InstructorNavProps {
   userName: string;
+  userEmail: string;
 }
 
-export function InstructorNav({ userName }: InstructorNavProps) {
+export function InstructorNav({ userName, userEmail }: InstructorNavProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    {
-      href: "/dashboard/instructor",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      href: "/dashboard/instructor/courses",
-      label: "My Courses",
-      icon: BookOpen,
-    },
-    {
-      href: "/dashboard/instructor/students",
-      label: "My Students",
-      icon: Users,
-    },
-    {
-      href: "/dashboard/instructor/attendance",
-      label: "Attendance",
-      icon: ClipboardCheck,
-    },
-    {
-      href: "/dashboard/instructor/analytics",
-      label: "Performance",
-      icon: BarChart3,
-    },
-  ];
-
-  // Get initials for avatar
-  const initials = userName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-green-900 to-green-800 text-white flex flex-col shadow-xl">
+    <div className="flex h-screen w-64 flex-col bg-gradient-to-b from-green-900 to-green-800 text-white">
       {/* Header */}
       <div className="p-6 border-b border-green-700">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3">
           <GraduationCap className="h-8 w-8" />
           <div>
-            <h1 className="text-xl font-bold">BrandHub</h1>
-            <p className="text-xs text-green-200">Instructor Portal</p>
+            <h2 className="text-xl font-bold">BrandHub</h2>
+            <p className="text-sm text-green-200">Instructor Portal</p>
           </div>
         </div>
       </div>
 
-      {/* User Info */}
+      {/* User Profile */}
       <div className="p-4 border-b border-green-700">
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 bg-green-600">
-            <AvatarFallback className="bg-green-600 text-white font-semibold">
-              {initials}
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-green-700 text-white">
+              {getInitials(userName)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
@@ -86,23 +88,25 @@ export function InstructorNav({ userName }: InstructorNavProps) {
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                isActive
-                  ? "bg-white text-green-900 shadow-md font-medium"
-                  : "text-green-100 hover:bg-green-700 hover:text-white"
-              }`}
-            >
-              <Icon className="h-5 w-5 flex-shrink-0" />
-              <span className="text-sm">{item.label}</span>
+            <Link key={item.href} href={item.href}>
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                  isActive
+                    ? "bg-white text-green-900 font-medium"
+                    : "text-green-100 hover:bg-green-700"
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <span>{item.title}</span>
+              </div>
             </Link>
           );
         })}
@@ -110,17 +114,17 @@ export function InstructorNav({ userName }: InstructorNavProps) {
 
       {/* Sign Out */}
       <div className="p-4 border-t border-green-700">
-        <form action={signout}>
+        <form action="/auth/signout" method="post">
           <Button
             type="submit"
             variant="ghost"
-            className="w-full justify-start text-green-100 hover:text-white hover:bg-green-700 transition-colors"
+            className="w-full justify-start text-green-100 hover:bg-green-700 hover:text-white"
           >
-            <LogOut className="h-5 w-5 mr-3" />
-            <span className="text-sm">Sign Out</span>
+            <LogOut className="mr-3 h-5 w-5" />
+            Sign Out
           </Button>
         </form>
       </div>
-    </aside>
+    </div>
   );
 }
