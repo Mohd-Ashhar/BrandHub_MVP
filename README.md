@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 BrandHub MVP - Multi-Brand Education Platform
 
-## Getting Started
+A full-stack Learning Management System (LMS) for managing multiple education brands under one platform.
 
-First, run the development server:
+## 🌟 Features
 
-```bash
+### Admin Dashboard
+
+- Student & Course Management (CRUD)
+- Multi-brand support
+- Real-time analytics with AI insights
+- Enrollment tracking
+- Revenue monitoring
+
+### Instructor Portal
+
+- Course management
+- Student attendance tracking
+- Performance analytics
+- Progress monitoring
+
+### Student Portal
+
+- Course enrollment
+- Progress tracking
+- Schedule management
+- Certificate generation
+- Personalized recommendations
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth
+- **Styling:** Tailwind CSS + shadcn/ui
+- **AI:** Google Gemini (Analytics Insights)
+- **Deployment:** Vercel
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- Supabase account
+- Google AI API key (optional)
+
+### Installation
+
+Clone the repository
+git clone https://github.com/Mohd-Ashhar/BrandHub_MVP.git
+cd BrandHub_MVP
+
+Install dependencies
+npm install
+
+Setup environment variables
+cp .env.example .env.local
+
+Add your Supabase credentials
+Run database migrations (see /sql folder)
+Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 Database Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Supabase project
+2. Run SQL scripts in order:
+   - `01_schema.sql` - Create tables
+   - `02_rls.sql` - Set up Row Level Security
+   - `03_functions.sql` - Create database functions
+   - `04_seed.sql` - Add sample data
 
-## Learn More
+## 🔐 Default Users
 
-To learn more about Next.js, take a look at the following resources:
+After seeding:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Admin:** admin@brandhub.com / password123
+- **Instructor:** instructor@brandhub.com / password123
+- **Student:** student@brandhub.com / password123
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+brandhub-mvp/
+├── app/
+│ ├── auth/ # Authentication
+│ ├── dashboard/
+│ │ ├── admin/ # Admin dashboard
+│ │ ├── instructor/ # Instructor portal
+│ │ └── student/ # Student portal
+│ └── api/ # API routes
+├── components/
+│ ├── admin/
+│ ├── instructor/
+│ ├── student/
+│ └── ui/ # shadcn components
+├── lib/
+│ └── supabase/ # Supabase client
+└── sql/ # Database scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎯 Key Features Demonstrated
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- ✅ Role-based authentication (Admin/Instructor/Student)
+- ✅ CRUD operations for all entities
+- ✅ Real-time data with Supabase
+- ✅ Server-side rendering & Server Actions
+- ✅ Responsive design
+- ✅ AI-powered analytics
+- ✅ Multi-tenant architecture (brands)
+
+## 🌐 Deployment
+
+Deployed on Vercel with automatic CI/CD:
+
+- **Production:** [Your Vercel URL]
+- **CI/CD:** Automatic deployment on push to `main`
+
+## 📝 Assignment Completion
+
+This project fulfills the Full-Stack Developer Assignment:
+
+- ✅ Complete authentication system
+- ✅ Admin dashboard with CRUD
+- ✅ Instructor & Student portals
+- ✅ Analytics with AI insights
+- ✅ Responsive design
+- ✅ Production deployment
+- ✅ Clean, maintainable code
+
+## 👨‍💻 Developer
+
+**Mohd Ashhar**
+
+- GitHub: [@Mohd-Ashhar](https://github.com/Mohd-Ashhar)
+- Project: [BrandHub MVP](https://github.com/Mohd-Ashhar/BrandHub_MVP)
+
+## 📄 License
+
+MIT License - Created as part of technical assessment
+
+---
+
+**Note:** This is a MVP (Minimum Viable Product) created for assessment purposes.

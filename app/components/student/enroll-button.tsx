@@ -4,27 +4,32 @@ import { Button } from "@/components/ui/button";
 import { enrollInCourse } from "@/app/dashboard/student/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
+
+interface EnrollButtonProps {
+  courseId: string;
+  isEnrolled: boolean;
+  isFull: boolean;
+}
 
 export function EnrollButton({
   courseId,
   isEnrolled,
   isFull,
-}: {
-  courseId: string;
-  isEnrolled: boolean;
-  isFull: boolean;
-}) {
+}: EnrollButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleEnroll = async () => {
     setLoading(true);
     const result = await enrollInCourse(courseId);
+
     if (result.success) {
+      alert("✅ Successfully enrolled in the course!");
       router.push("/dashboard/student/courses");
+      router.refresh();
     } else {
-      alert(result.message);
+      alert(`❌ ${result.message}`);
     }
     setLoading(false);
   };
@@ -32,6 +37,7 @@ export function EnrollButton({
   if (isEnrolled) {
     return (
       <Button disabled variant="outline" className="w-full">
+        <CheckCircle className="mr-2 h-4 w-4" />
         Already Enrolled
       </Button>
     );
