@@ -98,21 +98,6 @@ export default async function StudentDetailPage({
         </div>
       </div>
 
-      {/* Debug Info - Remove after testing */}
-      <Card className="bg-yellow-50 border-yellow-200">
-        <CardContent className="pt-4">
-          <p className="text-sm font-mono">
-            <strong>Debug:</strong> Student ID: {studentId}
-          </p>
-          <p className="text-sm font-mono">
-            Enrollments found: {enrollments.length}
-          </p>
-          <p className="text-sm font-mono">
-            Available courses: {availableCourses.length}
-          </p>
-        </CardContent>
-      </Card>
-
       {/* Student Info */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2">
