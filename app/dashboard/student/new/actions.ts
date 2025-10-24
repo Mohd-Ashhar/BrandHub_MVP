@@ -47,8 +47,14 @@ export async function createStudent(formData: FormData) {
 
     revalidatePath("/dashboard/admin/students");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // FIX: Change any to unknown
     console.error("Error creating student:", error);
-    return { success: false, message: error.message };
+    // FIX: Add type guard
+    let message = "An unexpected error occurred";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    return { success: false, message: message };
   }
 }

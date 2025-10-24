@@ -67,11 +67,17 @@ export async function createCourse(formData: FormData) {
       message: "Course created successfully",
       courseId: data.id,
     };
-  } catch (e: any) {
+  } catch (e: unknown) {
+    // FIX: Change any to unknown
     console.error("Unexpected error:", e);
+    // FIX: Add type guard
+    let message = "An unexpected error occurred";
+    if (e instanceof Error) {
+      message = e.message;
+    }
     return {
       success: false,
-      message: e.message || "An unexpected error occurred",
+      message: message,
     };
   }
 }
@@ -116,8 +122,14 @@ export async function updateCourse(id: string, formData: FormData) {
     revalidatePath("/dashboard/admin/courses");
     revalidatePath(`/dashboard/admin/courses/${id}`);
     return { success: true, message: "Course updated successfully" };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+  } catch (e: unknown) {
+    // FIX: Change any to unknown
+    // FIX: Add type guard
+    let message = "An unexpected error occurred";
+    if (e instanceof Error) {
+      message = e.message;
+    }
+    return { success: false, message: message };
   }
 }
 
@@ -139,7 +151,13 @@ export async function deleteCourse(id: string) {
 
     revalidatePath("/dashboard/admin/courses");
     return { success: true, message: "Course deleted successfully" };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+  } catch (e: unknown) {
+    // FIX: Change any to unknown
+    // FIX: Add type guard
+    let message = "An unexpected error occurred";
+    if (e instanceof Error) {
+      message = e.message;
+    }
+    return { success: false, message: message };
   }
 }

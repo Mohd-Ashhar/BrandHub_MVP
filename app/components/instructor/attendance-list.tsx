@@ -2,8 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MarkAttendanceForm } from "./mark-attendance-form";
 
+// FIX: Define an interface for the student data
+interface StudentAttendanceData {
+  enrollmentId: string;
+  studentName: string;
+  studentEmail: string;
+  studentId: string;
+  attendanceStatus: string;
+  attendanceId?: string | null;
+}
+
 interface AttendanceListProps {
-  students: any[];
+  students: StudentAttendanceData[]; // FIX: Use StudentAttendanceData[]
   courseId: string;
   sessionDate: string;
 }
@@ -21,7 +31,8 @@ export function AttendanceList({
       <CardContent>
         {students && students.length > 0 ? (
           <div className="space-y-3">
-            {students.map((student) => {
+            {students.map((student: StudentAttendanceData) => {
+              // FIX: Type student in map
               const initials = student.studentName
                 .split(" ")
                 .map((n: string) => n[0])

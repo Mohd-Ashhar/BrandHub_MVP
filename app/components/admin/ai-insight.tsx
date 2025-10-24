@@ -1,15 +1,27 @@
 "use client";
 
-import { readStreamableValue } from "@ai-sdk/rsc"; // ✅ Changed from ai/rsc
+import { readStreamableValue } from "@ai-sdk/rsc";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAIInsight } from "@/app/dashboard/admin/analytics/actions";
 import { Sparkles, Loader2 } from "lucide-react";
 
+// FIX: Define interfaces for the props
+interface EnrollmentStat {
+  enrollment_count: number;
+  // Allow other properties without specifying them
+  [key: string]: any;
+}
+
+interface StudentGrowthStat {
+  // Allow any object structure, but it's typed as an array of objects
+  [key: string]: any;
+}
+
 interface AIInsightProps {
-  enrollmentsData: any[];
-  studentGrowthData: any[];
+  enrollmentsData: EnrollmentStat[]; // FIX: Use EnrollmentStat[]
+  studentGrowthData: StudentGrowthStat[]; // FIX: Use StudentGrowthStat[]
 }
 
 export function AIInsight({
@@ -28,7 +40,7 @@ export function AIInsight({
       studentGrowthOverTime: studentGrowthData,
       totalCourses: enrollmentsData.length,
       totalEnrollments: enrollmentsData.reduce(
-        (acc, curr) => acc + curr.enrollment_count,
+        (acc, curr) => acc + curr.enrollment_count, // This is now type-safe
         0
       ),
     };

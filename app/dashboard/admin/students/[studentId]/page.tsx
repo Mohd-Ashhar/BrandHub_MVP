@@ -8,6 +8,30 @@ import { Badge } from "@/components/ui/badge";
 import { EnrollmentForm } from "@/app/components/admin/enrollment-form";
 import { DeleteStudentButton } from "@/app/components/admin/delete-student-button";
 
+// FIX: Define inferred types based on Supabase queries and usage
+// Ideally, these would come from generated Supabase types
+type CourseRow = {
+  id: string;
+  title: string;
+  status: string;
+  description?: string | null;
+  [key: string]: any; // Allow other fields
+};
+
+type EnrollmentRow = {
+  id: string;
+  student_id: string;
+  course_id: string;
+  enrollment_date: string;
+  progress: number;
+  [key: string]: any; // Allow other fields
+};
+
+// FIX: This is the combined type for the 'enrollments' variable
+type EnrollmentWithCourse = EnrollmentRow & {
+  course: CourseRow | null;
+};
+
 export default async function StudentDetailPage({
   params,
 }: {
@@ -39,17 +63,19 @@ export default async function StudentDetailPage({
     .in("status", ["active", "upcoming"])
     .order("title");
 
-  // ✅ FIX: Better enrollment query with debug logging
+  // Fetch enrollments
   const { data: enrollmentsRaw, error: enrollmentError } = await supabase
     .from("enrollments")
     .select("*")
-    .eq("student_id", studentId);
+    .eq("student_id", studentId)
+    .returns<EnrollmentRow[]>(); // FIX: Add .returns() for type safety
 
   console.log("📊 Raw enrollments:", enrollmentsRaw);
   console.log("❌ Enrollment error:", enrollmentError);
 
   // Build enrollments with course details
-  let enrollments: any[] = [];
+  // FIX: Change 'any[]' to 'EnrollmentWithCourse[]'
+  let enrollments: EnrollmentWithCourse[] = [];
   if (enrollmentsRaw && enrollmentsRaw.length > 0) {
     const courseIds = enrollmentsRaw.map((e) => e.course_id);
     console.log("📚 Course IDs:", courseIds);
@@ -57,7 +83,8 @@ export default async function StudentDetailPage({
     const { data: coursesData } = await supabase
       .from("courses")
       .select("*")
-      .in("id", courseIds);
+      .in("id", courseIds)
+      .returns<CourseRow[]>(); // FIX: Add .returns() for type safety
 
     console.log("📚 Courses data:", coursesData);
 
@@ -176,42 +203,46 @@ export default async function StudentDetailPage({
         <CardContent>
           {enrollments && enrollments.length > 0 ? (
             <div className="space-y-4">
-              {enrollments.map((enrollment) => (
-                <div
-                  key={enrollment.id}
-                  className="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50"
-                >
-                  <div className="flex-1">
-                    <h3 className="font-semibold">
-                      {enrollment.course?.title || "Course not found"}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {enrollment.course?.description || "No description"}
-                    </p>
-                    <div className="flex items-center gap-4 mt-2 text-sm">
-                      <Badge>{enrollment.course?.status || "unknown"}</Badge>
-                      <span className="text-gray-500">
-                        Progress: {enrollment.progress}%
-                      </span>
-                      <span className="text-gray-500">
-                        Enrolled:{" "}
-                        {new Date(
-                          enrollment.enrollment_date
-                        ).toLocaleDateString()}
-                      </span>
+              {enrollments.map(
+                (
+                  enrollment: EnrollmentWithCourse // FIX: Type enrollment
+                ) => (
+                  <div
+                    key={enrollment.id}
+                    className="border rounded-lg p-4 flex items-center justify-between hover:bg-gray-50"
+                  >
+                    <div className="flex-1">
+                      <h3 className="font-semibold">
+                        {enrollment.course?.title || "Course not found"}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {enrollment.course?.description || "No description"}
+                      </p>
+                      <div className="flex items-center gap-4 mt-2 text-sm">
+                        <Badge>{enrollment.course?.status || "unknown"}</Badge>
+                        <span className="text-gray-500">
+                          Progress: {enrollment.progress}%
+                        </span>
+                        <span className="text-gray-500">
+                          Enrolled:{" "}
+                          {new Date(
+                            enrollment.enrollment_date
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
+                    {enrollment.course && (
+                      <Link
+                        href={`/dashboard/admin/courses/${enrollment.course_id}`}
+                      >
+                        <Button variant="outline" size="sm">
+                          View Course
+                        </Button>
+                      </Link>
+                    )}
                   </div>
-                  {enrollment.course && (
-                    <Link
-                      href={`/dashboard/admin/courses/${enrollment.course_id}`}
-                    >
-                      <Button variant="outline" size="sm">
-                        View Course
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              ))}
+                )
+              )}
             </div>
           ) : (
             <p className="text-center py-8 text-gray-500">

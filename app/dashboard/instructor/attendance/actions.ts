@@ -49,8 +49,14 @@ export async function markAttendance(formData: FormData) {
 
     revalidatePath("/dashboard/instructor/attendance");
     return { success: true, message: "Attendance marked successfully" };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // FIX: Change any to unknown
     console.error("Error marking attendance:", error);
-    return { success: false, message: error.message };
+    // FIX: Add type guard
+    let message = "An unexpected error occurred";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    return { success: false, message: message };
   }
 }

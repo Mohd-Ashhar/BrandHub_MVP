@@ -4,6 +4,18 @@ import { Users, CheckCircle, XCircle, Calendar } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AttendanceFilters } from "@/app/components/instructor/attendance-filters";
 import { AttendanceList } from "@/app/components/instructor/attendance-list";
+
+// FIX: Define an interface based on the shape of the enrollment data
+interface EnrollmentWithStudent {
+  id: string;
+  student_id: string;
+  students: {
+    id: string;
+    name: string;
+    email: string;
+  } | null; // The foreign table 'students' can be null
+}
+
 export default async function InstructorAttendancePage({
   searchParams,
 }: {
@@ -57,7 +69,9 @@ export default async function InstructorAttendancePage({
     `
     )
     .eq("course_id", selectedCourse)
-    .eq("status", "active");
+    .eq("status", "active")
+    // FIX: Apply the type to the returned data
+    .returns<EnrollmentWithStudent[]>();
 
   // Get attendance records for selected date
   const { data: attendanceRecords } = await supabase
@@ -67,21 +81,25 @@ export default async function InstructorAttendancePage({
     .eq("session_date", selectedDate);
 
   // Merge data
-  const studentsWithAttendance = enrollments?.map((enrollment: any) => {
-    const attendanceRecord = attendanceRecords?.find(
-      (a) => a.enrollment_id === enrollment.id
-    );
+  const studentsWithAttendance = enrollments?.map(
+    (enrollment: EnrollmentWithStudent) => {
+      // FIX: Use the defined interface
+      const attendanceRecord = attendanceRecords?.find(
+        (a) => a.enrollment_id === enrollment.id
+      );
 
-    return {
-      enrollmentId: enrollment.id,
-      studentId: enrollment.student_id,
-      studentName: enrollment.students?.name || "Unknown",
-      studentEmail: enrollment.students?.email || "Unknown",
-      attendanceStatus: attendanceRecord?.status || "unmarked",
-      attendanceId: attendanceRecord?.id,
-      notes: attendanceRecord?.notes,
-    };
-  });
+      return {
+        enrollmentId: enrollment.id,
+        studentId: enrollment.student_id,
+        // Use optional chaining for safety, as students can be null
+        studentName: enrollment.students?.name || "Unknown",
+        studentEmail: enrollment.students?.email || "Unknown",
+        attendanceStatus: attendanceRecord?.status || "unmarked",
+        attendanceId: attendanceRecord?.id,
+        notes: attendanceRecord?.notes,
+      };
+    }
+  );
 
   // Calculate stats
   const totalStudents = studentsWithAttendance?.length || 0;
@@ -91,7 +109,8 @@ export default async function InstructorAttendancePage({
   const absentCount =
     studentsWithAttendance?.filter((s) => s.attendanceStatus === "absent")
       .length || 0;
-  const lateCount =
+  // FIX: (Proactive fix for unused var) Prefix with _
+  const _lateCount =
     studentsWithAttendance?.filter((s) => s.attendanceStatus === "late")
       .length || 0;
   const attendanceRate =

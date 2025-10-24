@@ -107,7 +107,7 @@ export default async function StudentDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            Welcome back, {student?.name?.split(" ")[0] || "Student"}! 🎉
+            Welcome back, {student?.name?.split(" ")[0] || "Student"}!
           </h1>
           <p className="text-gray-600 mt-1">
             Continue your learning journey and achieve your goals
@@ -334,7 +334,7 @@ export default async function StudentDashboardPage() {
                       </div>
                     </div>
                     <p className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded inline-block mb-3">
-                      🎯 Based on your learning goals
+                      ðŸŽ¯ Based on your learning goals
                     </p>
                     <Button variant="outline" size="sm" className="w-full">
                       Enroll Now
@@ -361,7 +361,7 @@ export default async function StudentDashboardPage() {
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold mb-2">
-                🎓 Keep Learning, Keep Growing!
+                ðŸŽ“ Keep Learning, Keep Growing!
               </h3>
               <p className="text-purple-100 text-sm">
                 You're on track to complete{" "}

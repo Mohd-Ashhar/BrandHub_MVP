@@ -5,6 +5,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Mail, BookOpen } from "lucide-react";
 import { redirect } from "next/navigation";
 
+// FIX: Define interface for the student data from Supabase
+interface StudentRow {
+  id: string;
+  name: string;
+  email: string;
+  engagement_score: number | null;
+  [key: string]: any; // Allow other properties from select *
+}
+
+// FIX: Define interface for the final student object with added properties
+interface StudentWithCourses extends StudentRow {
+  enrollments_count: number;
+  courses: string[];
+}
+
 export default async function InstructorStudentsPage() {
   const supabase = createClient();
 
@@ -63,18 +78,20 @@ export default async function InstructorStudentsPage() {
   console.log("👥 Student IDs:", uniqueStudentIds);
 
   // Fetch student details
-  let students: any[] = [];
+  let students: StudentWithCourses[] = []; // FIX: Use StudentWithCourses[]
   if (uniqueStudentIds.length > 0) {
     const { data: studentsData } = await supabase
       .from("students")
       .select("*")
-      .in("id", uniqueStudentIds);
+      .in("id", uniqueStudentIds)
+      .returns<StudentRow[]>(); // FIX: Add .returns() for type safety
 
     console.log("👨‍🎓 Students data:", studentsData);
 
     // Add enrollment count and courses to each student
     students =
-      studentsData?.map((student) => {
+      studentsData?.map((student): StudentWithCourses => {
+        // FIX: Type student and return
         const studentEnrollments = enrollments?.filter(
           (e) => e.student_id === student.id
         );
@@ -152,7 +169,8 @@ export default async function InstructorStudentsPage() {
         <CardContent>
           {students && students.length > 0 ? (
             <div className="space-y-3">
-              {students.map((student) => {
+              {students.map((student: StudentWithCourses) => {
+                // FIX: Type student
                 const initials = student.name
                   .split(" ")
                   .map((n: string) => n[0])
@@ -199,14 +217,16 @@ export default async function InstructorStudentsPage() {
                       </div>
                       <Badge
                         className={
+                          student.engagement_score &&
                           student.engagement_score >= 70
                             ? "bg-green-100 text-green-700"
-                            : student.engagement_score >= 50
+                            : student.engagement_score &&
+                              student.engagement_score >= 50
                             ? "bg-yellow-100 text-yellow-700"
                             : "bg-red-100 text-red-700"
                         }
                       >
-                        {student.engagement_score}% engaged
+                        {student.engagement_score || 0}% engaged
                       </Badge>
                     </div>
                   </div>

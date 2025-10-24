@@ -63,8 +63,14 @@ export async function enrollInCourse(courseId: string) {
     revalidatePath("/dashboard/student/browse");
 
     return { success: true, message: "Successfully enrolled!" };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // FIX: Change any to unknown
     console.error("Enrollment error:", error);
-    return { success: false, message: error.message || "Failed to enroll" };
+    // FIX: Add type guard
+    let message = "Failed to enroll";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    return { success: false, message: message };
   }
 }
