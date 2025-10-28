@@ -12,7 +12,11 @@ export const createClient = (useServiceRole = false) => {
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value;
+          try {
+            return cookieStore.get(name)?.value;
+          } catch (error) {
+            // Handle cookie retrieval errors
+          }
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
