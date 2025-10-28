@@ -39,8 +39,9 @@ export default async function StudentLayout({
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <StudentNav
+     <StudentNav
         userName={profile?.name || user.email || "Student"}
+        userEmail={profile?.email || user.email!}
         engagementScore={student?.engagement_score || 0}
       />
       <main className="flex-1 overflow-y-auto">{children}</main>
