@@ -98,8 +98,8 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
           disabled={loading}
         />
         <p className="text-xs text-gray-500">
-          This will be the student's initial password. They should change it
-          after first login.
+          This will be the student&apos;s initial password. They should change
+          it after first login.
         </p>
       </div>
 
@@ -161,7 +161,8 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500">
-            Leave unassigned if student isn't associated with a specific brand
+            Leave unassigned if student isn&apos;t associated with a specific
+            brand
           </p>
         </div>
       </div>

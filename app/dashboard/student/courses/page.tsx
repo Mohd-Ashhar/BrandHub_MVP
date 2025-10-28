@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock, Calendar } from "lucide-react";
+import { BookOpen, Calendar } from "lucide-react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -171,7 +171,7 @@ export default async function StudentCoursesPage() {
             <div className="text-center">
               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 mb-4">
-                You're not enrolled in any courses yet.
+                You&apos;re not enrolled in any courses yet.
               </p>
               <Link href="/dashboard/student">
                 <Button>Browse Courses</Button>

@@ -364,7 +364,7 @@ export default async function StudentDashboardPage() {
                 Keep Learning, Keep Growing!
               </h3>
               <p className="text-purple-100 text-sm">
-                You're on track to complete{" "}
+                You&apos;re on track to complete{" "}
                 <strong>{enrollmentCount || 0}</strong> courses. Every lesson
                 brings you closer to your goals. Stay focused and keep pushing
                 forward!

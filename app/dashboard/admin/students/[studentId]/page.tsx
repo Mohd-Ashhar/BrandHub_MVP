@@ -15,7 +15,7 @@ type CourseRow = {
   title: string;
   status: string;
   description?: string | null;
-  [key: string]: any; // Allow other fields
+  [key: string]: unknown; // Allow other fields (Changed from any)
 };
 
 type EnrollmentRow = {
@@ -24,7 +24,7 @@ type EnrollmentRow = {
   course_id: string;
   enrollment_date: string;
   progress: number;
-  [key: string]: any; // Allow other fields
+  [key: string]: unknown; // Allow other fields (Changed from any)
 };
 
 // FIX: This is the combined type for the 'enrollments' variable

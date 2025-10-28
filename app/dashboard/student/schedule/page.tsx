@@ -17,7 +17,7 @@ interface EnrollmentWithCourseAndBrand {
     } | null; // Brand can be null
   }; // courses is not null because of '!'
   // Allow other properties from enrollments.*
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export default async function StudentSchedulePage() {

@@ -95,7 +95,7 @@ export default async function InstructorDashboardPage() {
           Welcome back, {profile?.name?.split(" ")[0] || "Instructor"}! 👋
         </h1>
         <p className="text-gray-600 mt-1">
-          Here's what's happening with your courses today
+          Here&apos;s what&apos;s happening with your courses today
         </p>
       </div>
 
@@ -332,7 +332,7 @@ export default async function InstructorDashboardPage() {
               <p className="text-gray-700 text-sm">
                 Students who receive personalized feedback within 24 hours are
                 42% more likely to complete the course. Consider using the
-                "At-Risk Students" feature to identify students who need extra
+                &quot;At-Risk Students&quot; feature to identify students who need extra
                 attention.
               </p>
             </div>

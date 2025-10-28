@@ -11,7 +11,7 @@ interface StudentRow {
   name: string;
   email: string;
   engagement_score: number | null;
-  [key: string]: any; // Allow other properties from select *
+  [key: string]: unknown; // Allow other properties from select *
 }
 
 // FIX: Define interface for the final student object with added properties
