@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
 
   const handleDelete = async () => {
     if (deletingCourse) {
-      await deleteCourse(deletingCourse.id, brandId); // Pass brandId
+      await deleteCourse(deletingCourse.id);
       closeAlert();
     }
   };

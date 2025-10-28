@@ -45,9 +45,13 @@ export function CourseForm({ course, onClose, brandId }: CourseFormProps) {
     formData.append("title", values.title);
     formData.append("description", values.description || "");
 
+    if (brandId) {
+      formData.append("brandId", brandId);
+    }
+
     const result = course
-      ? await updateCourse(course.id, formData, brandId)
-      : await createCourse(formData, brandId);
+      ? await updateCourse(course.id, formData)
+      : await createCourse(formData);
 
     if (result.success) {
       onClose();
