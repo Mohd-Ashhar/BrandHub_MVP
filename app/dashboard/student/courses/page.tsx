@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function StudentCoursesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

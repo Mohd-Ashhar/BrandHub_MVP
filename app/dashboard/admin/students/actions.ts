@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 // ============================================
 
 export async function createStudent(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // 1. Extract form data
@@ -149,7 +149,7 @@ export async function createStudent(formData: FormData) {
 // ============================================
 
 export async function updateStudent(id: string, formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const name = formData.get("name") as string;
@@ -198,7 +198,7 @@ export async function updateStudent(id: string, formData: FormData) {
 // ============================================
 
 export async function deleteStudent(id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Delete from auth (cascade will handle profiles and students)
@@ -226,7 +226,7 @@ export async function deleteStudent(id: string) {
 // ============================================
 
 export async function enrollStudent(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const studentId = formData.get("studentId") as string;

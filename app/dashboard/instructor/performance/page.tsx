@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
 export default async function InstructorPerformancePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

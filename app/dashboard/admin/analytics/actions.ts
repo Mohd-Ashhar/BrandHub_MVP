@@ -7,7 +7,7 @@ import { createStreamableValue } from "@ai-sdk/rsc"; // ✅ Changed from ai/rsc
 
 // Get enrollment counts per course
 export async function getEnrollmentsPerCourse() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_course_enrollment_counts");
 
   if (error) {
@@ -20,7 +20,7 @@ export async function getEnrollmentsPerCourse() {
 
 // Get student growth over time
 export async function getStudentGrowthOverTime() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_daily_student_signups");
 
   if (error) {
@@ -33,7 +33,7 @@ export async function getStudentGrowthOverTime() {
 
 // Get top performing students
 export async function getTopStudents() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_top_students", {
     limit_count: 10,
   });
@@ -48,7 +48,7 @@ export async function getTopStudents() {
 
 // Get course completion rates
 export async function getCourseCompletionRates() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_course_completion_rates");
 
   if (error) {
@@ -61,7 +61,7 @@ export async function getCourseCompletionRates() {
 
 // Get dashboard summary stats
 export async function getDashboardStats() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Total students
   const { count: totalStudents } = await supabase

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { EnrollButton } from "@/app/components/student/enroll-button";
 
 export default async function BrowseCoursesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

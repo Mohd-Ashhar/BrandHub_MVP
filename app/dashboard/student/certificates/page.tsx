@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default async function StudentCertificatesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

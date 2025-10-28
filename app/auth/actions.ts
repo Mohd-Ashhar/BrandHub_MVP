@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 // LOGIN ACTION
 // ============================================
 export async function login(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const data = {
     email: formData.get("email") as string,
@@ -93,7 +93,7 @@ export async function login(formData: FormData) {
 // SIGNUP ACTION
 // ============================================
 export async function signup(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -177,7 +177,7 @@ export async function signup(formData: FormData) {
 // SIGNOUT ACTION
 // ============================================
 export async function signout() {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/login");

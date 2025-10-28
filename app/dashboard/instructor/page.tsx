@@ -13,7 +13,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function InstructorDashboardPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get current user
   const {

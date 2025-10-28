@@ -4,7 +4,7 @@ import { Users, BookOpen, TrendingUp, DollarSign, BarChart3 } from "lucide-react
 import Link from "next/link";
 
 export default async function AdminDashboardPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Fetch stats
   const { count: studentCount } = await supabase

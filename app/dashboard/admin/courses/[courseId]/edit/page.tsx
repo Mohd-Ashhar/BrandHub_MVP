@@ -12,7 +12,7 @@ export default async function EditCoursePage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: course } = await supabase
     .from("courses")

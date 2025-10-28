@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export async function getBrandId(): Promise<string | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   const {
     data: { user },

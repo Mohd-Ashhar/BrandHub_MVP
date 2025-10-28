@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   // Update user's auth session
   await updateSession(request);
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

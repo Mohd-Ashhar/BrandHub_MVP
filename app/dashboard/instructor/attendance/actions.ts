@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function markAttendance(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const enrollmentId = formData.get("enrollmentId") as string;
   const studentId = formData.get("studentId") as string;

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function createStudent(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;

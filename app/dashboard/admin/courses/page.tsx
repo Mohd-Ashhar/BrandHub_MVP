@@ -13,7 +13,7 @@ export default async function AdminCoursesPage({
   searchParams: Promise<{ search?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   let query = supabase.from("courses").select("*", { count: "exact" });
 

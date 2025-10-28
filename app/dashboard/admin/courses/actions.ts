@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 // CREATE COURSE
 // ============================================
 export async function createCourse(formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const title = formData.get("title") as string;
@@ -86,7 +86,7 @@ export async function createCourse(formData: FormData) {
 // UPDATE COURSE
 // ============================================
 export async function updateCourse(id: string, formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const title = formData.get("title") as string;
@@ -137,7 +137,7 @@ export async function updateCourse(id: string, formData: FormData) {
 // DELETE COURSE
 // ============================================
 export async function deleteCourse(id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { error } = await supabase.from("courses").delete().eq("id", id);

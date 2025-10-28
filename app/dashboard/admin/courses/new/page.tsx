@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function NewCoursePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Fetch brands for dropdown
   const { data: brands } = await supabase

@@ -38,7 +38,7 @@ export default async function StudentDetailPage({
   params: Promise<{ studentId: string }>;
 }) {
   const { studentId } = await params;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   console.log("🔍 Looking for student:", studentId);
 

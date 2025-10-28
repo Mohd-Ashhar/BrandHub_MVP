@@ -14,7 +14,7 @@ export default async function AdminStudentsPage({
   searchParams: Promise<{ search?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Simple query - no complex joins
   let query = supabase.from("students").select("*", { count: "exact" });

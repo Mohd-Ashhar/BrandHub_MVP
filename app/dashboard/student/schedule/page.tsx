@@ -21,7 +21,7 @@ interface EnrollmentWithCourseAndBrand {
 }
 
 export default async function StudentSchedulePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

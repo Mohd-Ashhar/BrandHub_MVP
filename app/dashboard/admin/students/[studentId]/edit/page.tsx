@@ -12,7 +12,7 @@ export default async function EditStudentPage({
   params: Promise<{ studentId: string }>;
 }) {
   const { studentId } = await params;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: student } = await supabase
     .from("students")

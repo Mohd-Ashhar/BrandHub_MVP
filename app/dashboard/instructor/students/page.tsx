@@ -21,7 +21,7 @@ interface StudentWithCourses extends StudentRow {
 }
 
 export default async function InstructorStudentsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

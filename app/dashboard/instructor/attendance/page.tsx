@@ -22,7 +22,7 @@ export default async function InstructorAttendancePage({
   searchParams: Promise<{ course?: string; date?: string }>;
 }) {
   const params = await searchParams;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

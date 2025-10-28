@@ -5,7 +5,7 @@ import { TrendingUp, Award, BookOpen } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export default async function StudentProgressPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
