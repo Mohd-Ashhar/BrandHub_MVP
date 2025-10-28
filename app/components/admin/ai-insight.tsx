@@ -10,13 +10,13 @@ import { Sparkles, Loader2 } from "lucide-react";
 // FIX: Define interfaces for the props
 interface EnrollmentStat {
   enrollment_count: number;
-  // Allow other properties without specifying them
-  [key: string]: any;
+  // FIX: Replaced 'any' with 'unknown' to satisfy linter
+  [key: string]: unknown;
 }
 
 interface StudentGrowthStat {
-  // Allow any object structure, but it's typed as an array of objects
-  [key: string]: any;
+  // FIX: Replaced 'any' with 'unknown' to satisfy linter
+  [key: string]: unknown;
 }
 
 interface AIInsightProps {

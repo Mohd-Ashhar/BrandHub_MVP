@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 // ============================================
 // CREATE STUDENT (Fixed - No Duplicate Profile)
 // ============================================
+
 export async function createStudent(formData: FormData) {
   const supabase = createClient();
 
@@ -134,11 +135,11 @@ export async function createStudent(formData: FormData) {
 
     revalidatePath("/dashboard/admin/students");
     return { success: true, message: "Student created successfully" };
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Unexpected error:", e);
     return {
       success: false,
-      message: e.message || "An unexpected error occurred",
+      message: e instanceof Error ? e.message : "An unexpected error occurred",
     };
   }
 }
@@ -146,6 +147,7 @@ export async function createStudent(formData: FormData) {
 // ============================================
 // UPDATE STUDENT
 // ============================================
+
 export async function updateStudent(id: string, formData: FormData) {
   const supabase = createClient();
 
@@ -183,14 +185,18 @@ export async function updateStudent(id: string, formData: FormData) {
     revalidatePath("/dashboard/admin/students");
     revalidatePath(`/dashboard/admin/students/${id}`);
     return { success: true, message: "Student updated successfully" };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+  } catch (e: unknown) {
+    return {
+      success: false,
+      message: e instanceof Error ? e.message : "An unexpected error occurred",
+    };
   }
 }
 
 // ============================================
 // DELETE STUDENT
 // ============================================
+
 export async function deleteStudent(id: string) {
   const supabase = createClient();
 
@@ -207,14 +213,18 @@ export async function deleteStudent(id: string) {
 
     revalidatePath("/dashboard/admin/students");
     return { success: true, message: "Student deleted successfully" };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+  } catch (e: unknown) {
+    return {
+      success: false,
+      message: e instanceof Error ? e.message : "An unexpected error occurred",
+    };
   }
 }
 
 // ============================================
 // ENROLL STUDENT IN COURSE
 // ============================================
+
 export async function enrollStudent(formData: FormData) {
   const supabase = createClient();
 
@@ -261,7 +271,10 @@ export async function enrollStudent(formData: FormData) {
 
     revalidatePath(`/dashboard/admin/students/${studentId}`);
     return { success: true, message: "Student enrolled successfully" };
-  } catch (e: any) {
-    return { success: false, message: e.message };
+  } catch (e: unknown) {
+    return {
+      success: false,
+      message: e instanceof Error ? e.message : "An unexpected error occurred",
+    };
   }
 }

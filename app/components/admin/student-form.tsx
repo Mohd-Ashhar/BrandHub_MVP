@@ -98,7 +98,8 @@ export function StudentForm({ brands }: { brands: Brand[] }) {
           disabled={loading}
         />
         <p className="text-xs text-gray-500">
-          This will be the student's initial password.
+          {/* FIX: Escaped apostrophe for react/no-unescaped-entities */}
+          This will be the student&apos;s initial password.
         </p>
       </div>
 
