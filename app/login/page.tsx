@@ -77,21 +77,21 @@ export default function LoginPage({
             <div className="space-y-2 text-xs text-gray-600">
               <div className="flex justify-between items-center bg-blue-50 p-2 rounded">
                 <span>
-                  <strong>Admin:</strong> admin@test.com
+                  <strong>Admin:</strong> ashharsiddiqui786@gmail.com
                 </span>
-                <span className="text-gray-500">Password: Test@123</span>
+                <span className="text-gray-500">Password: Ashar@123</span>
               </div>
               <div className="flex justify-between items-center bg-green-50 p-2 rounded">
                 <span>
-                  <strong>Instructor:</strong> instructor@test.com
+                  <strong>Instructor:</strong> ashharthecreator@gmail.com
                 </span>
-                <span className="text-gray-500">Password: Test@123</span>
+                <span className="text-gray-500">Password: Ashar@123</span>
               </div>
               <div className="flex justify-between items-center bg-purple-50 p-2 rounded">
                 <span>
-                  <strong>Student:</strong> student@test.com
+                  <strong>Student:</strong> applyforge00@gmail.com
                 </span>
-                <span className="text-gray-500">Password: Test@123</span>
+                <span className="text-gray-500">Password: Ashar@123</span>
               </div>
             </div>
           </div>
