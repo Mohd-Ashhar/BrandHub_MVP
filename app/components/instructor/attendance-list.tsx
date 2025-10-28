@@ -65,7 +65,7 @@ export function AttendanceList({
                       courseId={courseId}
                       sessionDate={sessionDate}
                       currentStatus={student.attendanceStatus}
-                      attendanceId={student.attendanceId}
+                      attendanceId={student.attendanceId ?? undefined}
                     />
                   </div>
                 </div>
